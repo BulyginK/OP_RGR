@@ -11,7 +11,7 @@ CONST
   NameTempFile = 'TF.DAT';
   NameStorageFile = 'SF.DAT';
   FirstSeek = 0;
-  MaxNumWords = 500;
+  MaxNumWords = 10000;
 TYPE
   Tree = ^Node;
   Node =  RECORD
@@ -208,6 +208,14 @@ BEGIN {InsertStorage}
     InsertWord(Root, WordTree, FIn)
 END; {InsertStorage}
 
+PROCEDURE CleanStorage();
+BEGIN {CleanStorage}
+  CLOSE(Storage);
+  CLOSE(TempFile);
+  Erase(Storage);
+  Erase(TempFile)
+END; {CleanStorage}
+
 PROCEDURE CopyOut(VAR FIn: FileOfWords; VAR FOut: TEXT);
 VAR
   Elem: WordRecords;
@@ -217,22 +225,14 @@ BEGIN {CopyOut}
     BEGIN
       READ(FIn, Elem);
       WRITELN(FOut, Elem.Word, ' ', Elem.Count)   
-    END
+    END;
+  CleanStorage()  
 END; {CopyOut}
-
-PROCEDURE CleanStorage();
-BEGIN {CleanStorage}
-  CLOSE(Storage);
-  CLOSE(TempFile);
-  Erase(Storage);
-  Erase(TempFile)
-END; {CleanStorage}
 
 PROCEDURE PrintStorage(VAR Words: TEXT);
 BEGIN {PrintStorage}
   SEEK(Storage, FirstSeek);
-  CopyOut(Storage, Words);
-  CleanStorage()
+  CopyOut(Storage, Words)
 END; {PrintStorage}
 
 BEGIN
